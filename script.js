@@ -1,21 +1,22 @@
 // Variables globales
-const MAX_TURNS_PER_DAY = 8;
-const TIME_INTERVALS = [
-  "09:00", "09:30",
-  "10:00", "10:30",
-  "11:00", "11:30",
-  "12:00", "12:30",
-  "13:00", "13:30",
-  "14:00"
-];
+const MAX_TURNS_PER_DAY = 12;
+const TIME_INTERVALS_BY_DAY = {
+  "1": ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"], // Lunes
+  "2": ["16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"], // Martes
+  "3": ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"], // Miércoles
+  "4": ["16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"], // Jueves
+  "5": ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30"], // Viernes
+};
 
-// Setup - llenar select de horarios
 window.addEventListener('load', () => {
   setupDateInput();
   fillTimeOptions();
-  loadBookedTurns(); // importante!
+  loadBookedTurns();
   checkAvailabilityAndUpdate();
-  document.getElementById('date').addEventListener('change', checkAvailabilityAndUpdate);
+  document.getElementById('date').addEventListener('change', () => {
+    fillTimeOptions();
+    checkAvailabilityAndUpdate();
+  });
   document.getElementById('booking-form').addEventListener('submit', submitBooking);
   document.getElementById('cancel-form').addEventListener('submit', cancelBooking);
 });
@@ -24,13 +25,13 @@ function setupDateInput() {
   const dateInput = document.getElementById('date');
   const today = new Date();
   dateInput.min = formatDate(today);
-  dateInput.max = formatDate(addDays(today, 30)); // 30 días para adelante
+  dateInput.max = formatDate(addDays(today, 30));
   dateInput.value = formatDate(today);
-  // Solo permitir lunes a viernes
+
   dateInput.addEventListener('input', () => {
     const day = new Date(dateInput.value).getDay();
-    if (day === 0 || day === 6) {
-      alert('Solo se permiten días de lunes a viernes');
+    if (day === 0 || day === 6 || !TIME_INTERVALS_BY_DAY[day]) {
+      alert('Solo se permiten días hábiles con atención médica.');
       dateInput.value = '';
     }
   });
@@ -38,7 +39,15 @@ function setupDateInput() {
 
 function fillTimeOptions() {
   const timeSelect = document.getElementById('time');
-  TIME_INTERVALS.forEach(t => {
+  timeSelect.innerHTML = ''; // Limpiar anteriores
+
+  const dateValue = document.getElementById('date').value;
+  if (!dateValue) return;
+
+  const dayOfWeek = new Date(dateValue).getDay();
+  const intervals = TIME_INTERVALS_BY_DAY[dayOfWeek] || [];
+
+  intervals.forEach(t => {
     const option = document.createElement('option');
     option.value = t;
     option.textContent = t;
@@ -101,7 +110,7 @@ function submitBooking(e) {
     return;
   }
   if (bookedToday.some(t => t.time === time)) {
-    alert('Ese horario ya fue reservado. Por favor elige otro.');
+    alert('Ese horario ya fue reservado. Por favor elegí otro.');
     return;
   }
 
@@ -122,24 +131,22 @@ function submitToSheet(data) {
 
   fetch(scriptURL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
-  .then(response => {
-    if (response.ok) {
-      showMessage(`✅ ¡Listo! Tu turno fue reservado con éxito para el ${data.fecha} a las ${data.hora}.`);
-      bookedTurns.push(data);
-      checkAvailabilityAndUpdate();
-      document.getElementById('booking-form').reset();
-    } else {
-      throw new Error('Error en la reserva');
-    }
-  })
-  .catch(() => {
-    alert('Hubo un error al reservar el turno. Por favor, intentá de nuevo más tarde.');
-  });
+    .then(response => {
+      if (response.ok) {
+        showMessage(`✅ ¡Listo! Tu turno fue reservado con éxito para el ${data.fecha} a las ${data.hora}.`);
+        bookedTurns.push(data);
+        checkAvailabilityAndUpdate();
+        document.getElementById('booking-form').reset();
+      } else {
+        throw new Error('Error en la reserva');
+      }
+    })
+    .catch(() => {
+      alert('Hubo un error al reservar el turno. Por favor, intentá de nuevo más tarde.');
+    });
 }
 
 function cancelBooking(e) {
@@ -166,34 +173,30 @@ function cancelBooking(e) {
 
   fetch(scriptURL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
-  .then(response => {
-    if (response.ok) {
-      showCancelMessage('✅ Turno cancelado correctamente.');
-      bookedTurns = bookedTurns.filter(t => !(t.contacto === contact && t.fecha === date && t.hora === time));
-      checkAvailabilityAndUpdate();
-      document.getElementById('cancel-form').reset();
-    } else {
-      throw new Error('Error al cancelar');
-    }
-  })
-  .catch(() => {
-    alert('Hubo un error al cancelar el turno. Por favor, intentá de nuevo más tarde.');
-  });
+    .then(response => {
+      if (response.ok) {
+        showCancelMessage('✅ Turno cancelado correctamente.');
+        bookedTurns = bookedTurns.filter(t => !(t.contacto === contact && t.fecha === date && t.hora === time));
+        checkAvailabilityAndUpdate();
+        document.getElementById('cancel-form').reset();
+      } else {
+        throw new Error('Error al cancelar');
+      }
+    })
+    .catch(() => {
+      alert('Hubo un error al cancelar el turno. Por favor, intentá de nuevo más tarde.');
+    });
 }
 
 function showMessage(msg) {
-  const messageDiv = document.getElementById('message');
-  messageDiv.textContent = msg;
+  document.getElementById('message').textContent = msg;
 }
 
 function showCancelMessage(msg) {
-  const cancelMessageDiv = document.getElementById('cancel-message');
-  cancelMessageDiv.textContent = msg;
+  document.getElementById('cancel-message').textContent = msg;
 }
 
 function loadBookedTurns() {

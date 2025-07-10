@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AnótateYa - Turnos Dra. Vanesa Scagliotti</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>AnótateYa</h1>
+        <h2>Turnos Dra. Vanesa Scagliotti</h2>
+        <form id="booking-form">
+            <label for="name">Nombre completo:</label>
+            <input type="text" id="name" name="name" required />
+
+            <label for="reason">Motivo de consulta:</label>
+            <textarea id="reason" name="reason" rows="2" required></textarea>
+
+            <label for="contact">Teléfono o Email (para cancelar turno):</label>
+            <input type="text" id="contact" name="contact" required />
+
+            <label for="date">Día (Lunes a Viernes):</label>
+            <input type="date" id="date" name="date" required />
+
+            <label for="time">Horario (intervalos de 30 min):</label>
+            <select id="time" name="time" required>
+                <!-- Opciones generadas por JS -->
+            </select>
+
+            <button type="submit">Reservar turno</button>
+        </form>
+        <div id="message"></div>
+
+        <hr />
+
+        <h3>Cancelar turno</h3>
+        <form id="cancel-form">
+            <label for="cancel-contact">Ingresa tu teléfono o email:</label>
+            <input type="text" id="cancel-contact" name="cancel-contact" required />
+            <button type="submit">Cancelar turno</button>
+        </form>
+        <div id="cancel-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

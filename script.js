@@ -118,7 +118,7 @@ function submitBooking(e) {
 }
 
 function submitToSheet(data) {
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzc0bnV_jZ7Hrn8ej_qUaTs0E5NdrLPdbxKdjMxzhkU1HYPmUpz-OeRVbRQDnM45gCV/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzXcdQAfSE7U-BDD8nMXahYW-9lsslri0BWB6-ZUH59rfcZ_TK-Mb8wnuRxchQLIl-E/exec';
 
   fetch(scriptURL, {
     method: 'POST',
@@ -162,7 +162,7 @@ function cancelBooking(e) {
     hora: time
   };
 
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzc0bnV_jZ7Hrn8ej_qUaTs0E5NdrLPdbxKdjMxzhkU1HYPmUpz-OeRVbRQDnM45gCV/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzXcdQAfSE7U-BDD8nMXahYW-9lsslri0BWB6-ZUH59rfcZ_TK-Mb8wnuRxchQLIl-E/exec';
 
   fetch(scriptURL, {
     method: 'POST',
@@ -197,7 +197,7 @@ function showCancelMessage(msg) {
 }
 
 function loadBookedTurns() {
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzc0bnV_jZ7Hrn8ej_qUaTs0E5NdrLPdbxKdjMxzhkU1HYPmUpz-OeRVbRQDnM45gCV/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbzXcdQAfSE7U-BDD8nMXahYW-9lsslri0BWB6-ZUH59rfcZ_TK-Mb8wnuRxchQLIl-E/exec';
 
   fetch(scriptURL)
     .then(response => response.json())
